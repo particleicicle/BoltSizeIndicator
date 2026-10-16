@@ -38,7 +38,7 @@ namespace BoltSizeIndicatorOASIS {
         public override string ID => "BoltSizeIndicatorOASIS"; // Your (unique) mod ID 
         public override string Name => "Bolt Size Indicator Support for OASIS"; // Your mod name
         public override string Author => "particleicicle"; // Name of the Author (your name)
-        public override string Version => "1.0"; // Version
+        public override string Version => "1.0.1"; // Version
         public override string Description => "Adds support for OASIS bolts to Bolt Size Indicator."; // Short description of your mod
         public override Game SupportedGames =>  Game.MySummerCar_And_MyWinterCar;
 
@@ -58,7 +58,17 @@ namespace BoltSizeIndicatorOASIS {
         private static bool harmonyPatched;
 
         private void Mod_PostLoad() {
-            if (!ModLoader.IsModPresent("BoltSizeIndicator") || !ModLoader.IsReferencePresent("OASIS") || harmonyPatched) return;
+            if (!ModLoader.IsModPresent("BoltSizeIndicator")) {
+
+                if (harmonyPatched) {
+                    harmony?.UnpatchAll(ID);
+                    harmonyPatched = false;
+                }
+
+                return;
+            }
+
+            if (!ModLoader.IsReferencePresent("OASIS") || harmonyPatched) return;
 
             if (harmony == null) harmony = HarmonyInstance.Create(ID);
             harmony.PatchAll(Assembly.GetExecutingAssembly());

@@ -9,7 +9,7 @@ namespace BoltSizeIndicator {
         public override string ID => "BoltSizeIndicator"; // Your (unique) mod ID 
         public override string Name => "Bolt Size Indicator"; // Your mod name
         public override string Author => "particleicicle"; // Name of the Author (your name)
-        public override string Version => "1.1.1"; // Version
+        public override string Version => "1.1.2"; // Version
         public override string Description => "Indicates if the selected tool is the wrong size with a different color."; // Short description of your mod
         public override Game SupportedGames => Game.MySummerCar_And_MyWinterCar;
 
@@ -42,18 +42,21 @@ namespace BoltSizeIndicator {
 
             spannerBoltCheckFSM.enabled = false;
 
-            var shader = Shader.Find("GUI/Text Shader");
+            Shader shader = Shader.Find("GUI/Text Shader");
 
-            _smallBoltMat = new Material(shader)
-            {
-                name = "smallbolt",
-                color = Color.yellow
-            };
-            _bigBoltMat = new Material(shader)
-            {
-                name = "bigbolt",
-                color = Color.red
-            };
+            if (_bigBoltMat == null) {
+                _bigBoltMat = new Material(shader) {
+                    name = "bigbolt",
+                    color = Color.red
+                };
+            }
+
+            if (_smallBoltMat == null) {
+                _smallBoltMat = new Material(shader) {
+                    name = "smallbolt",
+                    color = Color.yellow
+                };
+            }  
 
             var stateToolTooBig = spannerBoltCheckFSM.GetState("State 1");
 
@@ -64,45 +67,40 @@ namespace BoltSizeIndicator {
 
             var stateToolTooSmall = spannerBoltCheckFSM.GetState("State 2");
 
-
-
             var boltGameObject = spannerBoltCheckFSM.FsmVariables.FindFsmGameObject("Bolt");
             var boltFsmOwnerDefault = new FsmOwnerDefault() { GameObject = boltGameObject, OwnerOption = OwnerDefaultOption.SpecifyGameObject };
 
-            var meshGameObject = spannerBoltCheckFSM.FsmVariables.FindFsmGameObject("Mesh");
-            var meshFsmOwnerDefault = new FsmOwnerDefault() { GameObject = meshGameObject, OwnerOption = OwnerDefaultOption.SpecifyGameObject };
+            if (stateToolTooSmall == null) {
+                var meshGameObject = spannerBoltCheckFSM.FsmVariables.FindFsmGameObject("Mesh");
+                var meshFsmOwnerDefault = new FsmOwnerDefault() { GameObject = meshGameObject, OwnerOption = OwnerDefaultOption.SpecifyGameObject };
 
-            if (stateToolTooSmall == null)
-            {
                 stateToolTooSmall = spannerBoltCheckFSM.AddState("State 2");
-                stateToolTooSmall.AddAction(new GetChild()
-                {
+                stateToolTooSmall.AddAction(new GetChild() {
                     Fsm = spannerBoltCheckFSM.Fsm,
                     childName = new FsmString(),
                     gameObject = boltFsmOwnerDefault,
                     withTag = new FsmString() { Value = "Untagged" },
                     storeResult = meshGameObject
                 });
-                stateToolTooSmall.AddAction(new SetMaterial()
-                {
+                stateToolTooSmall.AddAction(new SetMaterial() {
+                    Fsm = spannerBoltCheckFSM.Fsm,
                     gameObject = meshFsmOwnerDefault,
                     material = new FsmMaterial() { Value = _smallBoltMat },
                     materialIndex = new FsmInt() { Value = 0 }
                 });
                 stateToolTooSmall.AddTransition("FINISHED", "Wait");
             }
-            else
-            {
+            else {
                 stateToolTooSmall.Actions[0].Enabled = true;
                 stateToolTooSmall.Actions[1].Enabled = true;
                 ((SetMaterial)stateToolTooSmall.Actions[1]).material = new FsmMaterial() { Value = _smallBoltMat };
                 stateToolTooSmall.Transitions[0].ToState = "Wait";
             }
 
+            //for MWC where the transition from the YELLOW-event no longer goes to State 2 as it was removed
             var checkState = spannerBoltCheckFSM.GetState("Check tool");
 
-            if (checkState != null)
-            {
+            if (checkState != null) {
                 var trans = checkState.Transitions.FirstOrDefault(x => x.EventName == "YELLOW");
                 if (trans != null && trans.ToState != stateToolTooSmall.Name) trans.ToState = stateToolTooSmall.Name;
             }
