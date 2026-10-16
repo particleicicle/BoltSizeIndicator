@@ -1,7 +1,8 @@
 # BoltSizeIndicator
 
 A mod for My Summer/Winter Car that indicates with a color if a bolt is larger or smaller than the tool you're holding. 
-This is a feature that ToplessGun was seemingly developing but decided to scrap at some point in development based on the names of events that are still present in the current iteration of the bolting system. The events named RED and YELLOW, that are sent when a bolt is larger or smaller than the tool in hand. Combined with disabled actions that would set the bolt material, this feature is pretty easy to bring back, with only one custom state needed to wait for the bolt to be unselected to set the material back to normal for MSC and older versions of MWC (later MWC versions remove one of the material setting states, but it can also be easily recreated).
+
+This was a feature that ToplessGun was seemingly developing at some point but decided to scrap based on the names of events that are still present in the current iteration of the bolting system. The events named RED and YELLOW, that are sent when a bolt is larger or smaller than the tool in hand. Combined with disabled actions that would set the bolt material, this feature is pretty easy to bring back, with only one custom state needed to wait for the bolt to be unselected to set the material back to normal for MSC and older versions of MWC (later MWC versions remove one of the material setting states, but it can also be easily recreated).
 
 ## Dependencies
 
