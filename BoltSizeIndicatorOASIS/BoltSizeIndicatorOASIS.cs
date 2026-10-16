@@ -13,7 +13,7 @@ namespace BoltSizeIndicatorOASIS {
 
         private static bool Prefix(Bolt __instance) {
             if (__instance.isMouseOver) {
-                if (!(!BoltSizeIndicator.BoltSizeIndicator.HoldingRatchet || __instance.canUseRatchet)) {
+                if (!BoltSizeIndicator.BoltSizeIndicator.HoldingRatchet || __instance.canUseRatchet) {
                     if (CannotBeBolted.Add(__instance)) {
                         CanBeBolted.SetValue(__instance, false);
                         __instance.materialCache = __instance.renderer.sharedMaterial;
